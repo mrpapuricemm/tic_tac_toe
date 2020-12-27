@@ -55,7 +55,7 @@ batter_up = 0
 #initializing the board -- setting a numerical board using the board_contents list
 #which will be updated as we play the game
 def board_print():
-    print('\nHere is the current game board!')
+    print('\n-------------------------------\nHere is the current game board!')
     for i in range(3):
         print('      -------------')
         print('row:'+str(i+1),end="")
@@ -64,6 +64,7 @@ def board_print():
         print(' |', end ="")
         print()
     print('      -------------')
+    print('-------------------------------\n')
 
 #setting player 1's icon & name
 def set_p1():
@@ -88,7 +89,7 @@ def set_p1():
 def set_p2():
     global p2_icon
     global p2_name
-    p2_name = input('Player 2, what is your name? ')
+    p2_name = input('\nPlayer 2, what is your name? ')
 
     #determining player 2's icon based on being the opposite of the
     #index of player 1's icon
@@ -96,6 +97,50 @@ def set_p2():
 
     #displaying player 2's icon
     print(p2_name+', your icon is',p2_icon)
+
+#initial game setup.
+#[establishing a new board, welcoming, setting players, & printing board]
+def game_setup():
+    global board_contents
+    board_contents = initial_board_contents.copy()
+    print('\n-#-#--#-#--#-#--#-#--#-#-\nHello and welcome to Tic Tac Toe Deluxe\n')
+    set_p1()
+    set_p2()
+    global player_info
+    player_info = [[p1_name,p1_icon],[p2_name,p2_icon]] #list of the game's player info, used in the move_bloc function
+    board_print()
+
+#Building a general/non specific player move function
+def move_bloc():
+    global player_info
+    global batter_up
+    playerKeepGoing = True
+    while playerKeepGoing:
+        notOneThroughNine = True
+        while notOneThroughNine:
+            move = input(player_info[batter_up][0]+' what is your move? (1-9) ')
+            try:
+                move = int(move)
+                if move in initial_board_contents:
+                    notOneThroughNine = False
+                else:
+                    print('\nPlease enter a number 1-9\n')
+            except ValueError as e:
+                print('\nPlease enter a number 1-9\n') 
+        if move in board_contents: #if the variable move is in the set of the game board
+            board_contents[move-1] = player_info[batter_up][1] #then convert the move into an index #
+            #by subtracting 1 & then set the player icon to the indexed space in "board_contents"
+            playerKeepGoing = False
+            board_print()
+            check_winner()
+            if batter_up == 0:
+                batter_up = 1
+            elif batter_up == 1:
+                batter_up = 0
+        elif board_contents[move-1] in acceptable_icons: #if the space already has an X or O
+            print('That space is taken, please choose again\n')
+        elif move not in board_contents: #if the user enters an input not in the game board options
+            print('Your input is not an option on the game board, please choose again\n')
 
 #checking if the board has reached a win state
 def check_winner():
@@ -110,18 +155,6 @@ def check_winner():
             print('Congratulations',player_info[batter_up][0]+'!\n')
             global keepGoing
             keepGoing = False #and end the loop, to end the current game.
-
-#initial game setup.
-#[establishing a new board, welcoming, setting players, & printing board]
-def game_setup():
-    global board_contents
-    board_contents = initial_board_contents.copy()
-    print('\n-#-#--#-#--#-#--#-#--#-#-\nHello and welcome to Tic Tac Toe Deluxe\n')
-    set_p1()
-    set_p2()
-    global player_info
-    player_info = [[p1_name,p1_icon],[p2_name,p2_icon]] #list of the game's player info, used in the move_bloc function
-    board_print()
 
 #checking if the user wants to play again after a full completed round
 def lets_play_again():
@@ -144,36 +177,6 @@ def lets_play_again():
         print('ending...\n')
         time.sleep(.8)
         print('See you next time\nGoodbye!\n')
-
-#Building a general/non specific player move function
-def move_bloc():
-    global player_info
-    global batter_up
-    playerKeepGoing = True
-    while playerKeepGoing:
-        while True:
-            #global batter_up
-            move = input(player_info[batter_up][0]+' what is your move? (1-9) ')
-            try:
-                move = int(move)
-                break
-            except ValueError:
-                print('Your answer is not a number 1-9, please enter a number 1-9\n') 
-        if move in board_contents: #if the variable move is in the set of the game board
-            board_contents[move-1] = player_info[batter_up][1] #then convert the move into an index #
-            #by subtracting 1 & then set the player icon to the indexed space in "board_contents"
-            playerKeepGoing = False
-            board_print()
-            check_winner()
-            if batter_up == 0:
-                batter_up = 1
-            elif batter_up == 1:
-                batter_up = 0
-        elif board_contents[move-1] in acceptable_icons: #if the space already has an X or O
-            print('That space is taken, please choose again\n')
-        elif move not in board_contents: #if the user enters an input not in the game board options
-            print('Your input is not an option on the game board, please choose again\n')
-
 
 ################################################################################
 #main#
