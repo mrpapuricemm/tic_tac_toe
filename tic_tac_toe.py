@@ -8,18 +8,25 @@ import time
 ###################################
 
 #player icons
+global p1_icon
+global p2_icon
 p1_icon = ""
 p2_icon = ""
 
 #player names
+global p1_name
+global p2_name
 p1_name = "Player 1"
 p2_name = "Player 2"
 
 #while loop variables
+global keepGoing
 keepGoing = True
 global keepGoingNextGame
 keepGoingNextGame = True
-batter_up = 0
+global anotherRound
+anotherRound = True
+
 
 ######let us set some lists#####
 ################################
@@ -41,8 +48,10 @@ next_game_options = ["yes","y","Y","Yes","YES","no","n","N","No","NO"]
 #setting acceptable icon list
 acceptable_icons = ["X","O"]
 
-#setting the list to easily determine who is up
-whose_up = [[p1_name,p1_icon],[p2_name,p2_icon]]
+#setting the variable to determine who is up
+batter_up = 0
+#and a list to iterate through to deliver the proper name and game piece to the board
+#player_info = [[p1_name,p1_icon],[p2_name,p2_icon]]
 
 
 #initializing the board -- setting a numerical board using the board_contents list
@@ -84,7 +93,8 @@ def set_p2():
     global p2_name
     p2_name = input('Player 2, what is your name? ')
 
-    #determining player 2's icon based on the index of player 1's icon
+    #determining player 2's icon based on being the opposite of the
+    #index of player 1's icon
     p2_icon = acceptable_icons[1-acceptable_icons.index(p1_icon)]
 
     #displaying player 2's icon
@@ -96,13 +106,13 @@ def p1_move():
     while p1keepGoing:
         while True:
             move = input(p1_name+' what is your move? (1-9) ')
-            try:
+            try: #checking if player 1's move is an integer
                 move = int(move)
                 break
             except ValueError:
                 print('Your answer is not a number 1-9, please enter a number 1-9\n') 
         if move in board_contents: #if the variable move is in the set of the game board
-            board_contents[move-1] = p1_icon #then convert the move into an index #
+            board_contents[move-1] = p1_icon #then convert the move into an index
             #by subtracting 1 & then set the player icon to the indexed space in "board_contents"
             p1keepGoing = False
         elif board_contents[move-1] in acceptable_icons: #if the space already has an X or O
@@ -123,36 +133,6 @@ def p2_move(): #for comments, see "p1_move()" function comments
         print('that space is taken')
         p2_move()
 
-###############################################################
-#####Attempting to replace the p1_move & p2_move functions#####
-###############################################################
-#Building a general/non specific player move function
-def player_move():
-    global whose_up
-    playerKeepGoing = True
-    while playerKeepGoing:
-        while True:
-            global batter_up
-            move = input(whose_up[batter_up][0]+' what is your move? (1-9) ')
-            try:
-                move = int(move)
-                break
-            except ValueError:
-                print('Your answer is not a number 1-9, please enter a number 1-9\n') 
-        if move in board_contents: #if the variable move is in the set of the game board
-            board_contents[move-1] = whose_up[batter_up][1] #then convert the move into an index #
-            #by subtracting 1 & then set the player icon to the indexed space in "board_contents"
-            playerKeepGoing = False
-        elif board_contents[move-1] in acceptable_icons: #if the space already has an X or O
-            print('That space is taken, please choose again\n')
-        elif move not in board_contents: #if the user enters an input not in the game board options
-            print('Your input is not an option on the game board, please choose again\n')
-        if batter_up == 0:
-            batter_up = 1
-        elif batter_up == 1:
-            batter_up = 0
-###############################################################
-###############################################################
 
 #checking if the board has reached a win state
 def check_winner():
@@ -172,45 +152,27 @@ def check_winner():
 def game_setup():
     global board_contents
     board_contents = initial_board_contents.copy()
-    print('\nHello and welcome (back) to Tic Tac Toe Deluxe\n')
+    print('\n-#-#--#-#--#-#--#-#--#-#-\nHello and welcome to Tic Tac Toe Deluxe\n')
     set_p1()
     set_p2()
+    global player_info
+    player_info = [[p1_name,p1_icon],[p2_name,p2_icon]]
     board_print()
 
-#uncomment this function to run currently test
-#testcenter()
-print('\n[now passed the testcenter() function; now entering, "#main"]')
-
-################################################################################
-#main#
-################################################################################
-while keepGoingNextGame:
-    game_setup()
-    while keepGoing:
-        p1_move()
-        board_print()
-        check_winner()
-        if keepGoing is False:
-            print('Congratulations',p1_name+'!\n')
-            break
-        
-        p2_move()
-        board_print()
-        check_winner()
-        if keepGoing is False:
-            print('Congratulations',p2_name+'!\n')
-
-    while True:  #checking if the user wants to play again
-        global anotherRound
-        anotherRound = input('Do you want to play another game? (Please answer with "Yes" or "No") ')
-        if anotherRound in next_game_options:
+#checking if the user wants to play again after a full completed round
+def lets_play_again():
+    while anotherRound:
+        global newGame
+        newGame = input('Do you want to play another game? (Please answer with "Yes" or "No") ')
+        if newGame in next_game_options:
             break
         else:
             print('Please enter either "Yes" or "No"\n')
-    if anotherRound in next_game_options[0:5]: #did the user enter yes of some form?
+    if newGame in next_game_options[0:5]: #did the user enter yes of some form?
         keepGoingNextGame = True
+        global keepGoing
         keepGoing = True        
-    elif anotherRound in next_game_options[5:]: #did the user enter no of some form?
+    elif newGame in next_game_options[5:]: #did the user enter no of some form?
         keepGoingNextGame = False
         print('\nThanks for playing, have a great day!\n\n') #outgoing notes
         time.sleep(.5)
@@ -218,9 +180,70 @@ while keepGoingNextGame:
         time.sleep(.8)
         print('See you next time\nGoodbye!\n')
 
+#uncomment this function to run current test
+#testcenter()
+#print('\n[now passed the testcenter() function; now entering, "#main"]')
 
 ###############################################################
-#THIS IS A TESTING CENTER to gradually bring on new functions and major changes
+#####Attempting to replace the p1_move & p2_move functions#####
+###############################################################
+#Building a general/non specific player move function
+def player_move():
+    global player_info
+    global batter_up
+    playerKeepGoing = True
+    while playerKeepGoing:
+        while True:
+            #global batter_up
+            move = input(player_info[batter_up][0]+' what is your move? (1-9) ')
+            try:
+                move = int(move)
+                break
+            except ValueError:
+                print('Your answer is not a number 1-9, please enter a number 1-9\n') 
+        if move in board_contents: #if the variable move is in the set of the game board
+            board_contents[move-1] = player_info[batter_up][1] #then convert the move into an index #
+            #by subtracting 1 & then set the player icon to the indexed space in "board_contents"
+            playerKeepGoing = False
+            board_print()
+            check_winner()
+            if batter_up == 0:
+                batter_up = 1
+            elif batter_up == 1:
+                batter_up = 0
+        elif board_contents[move-1] in acceptable_icons: #if the space already has an X or O
+            print('That space is taken, please choose again\n')
+        elif move not in board_contents: #if the user enters an input not in the game board options
+            print('Your input is not an option on the game board, please choose again\n')
+###############################################################
+###############################################################
+
+
+
+################################################################################
+#main#
+################################################################################
+while keepGoingNextGame:
+    game_setup()
+    while keepGoing:
+        #p1_move()
+        #board_print()
+        #check_winner()
+        player_move() #comment out this and uncomment the others in this while loop to get back to normal
+        if keepGoing is False:
+            print('Congratulations',p1_name+'!\n')
+            break
+        
+        #p2_move()
+        #board_print()
+        #check_winner()
+        #if keepGoing is False:
+            #print('Congratulations',p2_name+'!\n')
+    lets_play_again()
+
+
+###############################################################
+#THIS IS A TESTING CENTER
 def testcenter():
     set_p1()
     set_p2()
