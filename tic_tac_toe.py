@@ -178,11 +178,11 @@ def move_bloc():
 ################################################################################
 #main#
 ################################################################################
-while keepGoingNextGame:
-    game_setup()
-    while keepGoing:
-        move_bloc()
-    lets_play_again()
+while keepGoingNextGame:    #boolean allowing for multiple games upon request
+    game_setup()            #sets board and players
+    while keepGoing:        #boolean allowing for the game to continue until a win state is reached 
+        move_bloc()         #this is the core gameplay, the player's move is asked and registered to the board
+    lets_play_again()       #To play again it resets the booleans to True, otherwise to False
 
 ################################################################################
 ################################################################################
